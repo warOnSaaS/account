@@ -1,0 +1,30 @@
+{
+  "name": "@waronsaas/account",
+  "version": "0.1.0",
+  "description": "One free warOnSaaS account for every hosted app: sign in with GitHub, Google or an email link. An OpenID Connect provider with dynamic registration for MCP clients.",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "repository": { "type": "git", "url": "https://github.com/warOnSaaS/account" },
+  "engines": { "node": ">=20" },
+  "main": "server.mjs",
+  "exports": {
+    ".": "./server.mjs",
+    "./client": "./client/account-client.mjs",
+    "./prompt": "./client/prompt.js",
+    "./tools.json": "./tools.json"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "ACCOUNT_DEV_LINKS=1 PUBLIC_URL=http://localhost:3990 DATABASE_URL=${DATABASE_URL:-postgres://postgres:wos@localhost:55488/wos_account} node server.mjs",
+    "test": "node --test --test-concurrency=1 --test-timeout=60000 test/*.test.mjs",
+    "sync-kit": "node scripts/sync-kit.mjs",
+    "add-client": "node scripts/add-client.mjs",
+    "github-app": "node scripts/github-app.mjs",
+    "shots": "node scripts/shots.mjs",
+    "check:clean": "node scripts/check-clean.mjs",
+    "check": "node --test --test-concurrency=1 --test-timeout=60000 test/*.test.mjs && node scripts/check-clean.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}
