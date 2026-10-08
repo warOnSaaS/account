@@ -316,7 +316,10 @@ export function createHandler(env = process.env) {
     if (q.post_logout_redirect_uri && q.client_id) {
       const c = await ctx.oidc.client(q.client_id);
       const want = (() => { try { return new URL(q.post_logout_redirect_uri).origin; } catch { return null; } })();
-      if (c && want && c.redirect_uris.some((u) => new URL(u).origin === want)) to = q.post_logout_redirect_uri;
+      const loop = (o) => /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(o);
+      // Same origin as a registered redirect; for this computer (loopback) any port, as for redirects.
+      const hostOf = (o) => o.replace(/:\d+$/, '');
+      if (c && want && c.redirect_uris.some((u) => { const o = new URL(u).origin; return o === want || (loop(o) && loop(want) && hostOf(o) === hostOf(want)); })) to = q.post_logout_redirect_uri;
     }
     redirect(res, to, { 'set-cookie': setSession('', 0) });
   }
