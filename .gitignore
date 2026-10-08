@@ -4,3 +4,4 @@ node_modules
 .env*
 *.names
 .names
+parity-report.json

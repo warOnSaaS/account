@@ -1,0 +1,797 @@
+{
+  "$schema": "https://raw.githubusercontent.com/warOnSaaS/suite/main/packages/tools/tools.schema.json",
+  "app": "team",
+  "version": 1,
+  "tools": [
+    {
+      "name": "team.list",
+      "title": "List my teams",
+      "description": "The teams you are on, with your role on each.",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "teams": {
+            "type": "array"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.create",
+      "title": "Create a team",
+      "description": "Start a new team. You are its owner. It gets the default brand and keeps its data in warOnSaaS Cloud until you choose another home.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Team name, like Acme Dental"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Team id"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Short name used in links"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "write",
+      "confirm": "none",
+      "emits": [
+        "team.created"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.get",
+      "title": "Show a team",
+      "description": "A team: name, members, open invites, brand kit and data home.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object"
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.update",
+      "title": "Rename a team",
+      "description": "Change the team name. Admins and owners only.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "name": {
+            "type": "string",
+            "description": "New name"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.invite",
+      "title": "Invite someone",
+      "description": "Invite a person by email. If they already have an account they join now; otherwise they join the first time they sign in with that address.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "email": {
+            "type": "string",
+            "description": "Their email"
+          },
+          "role": {
+            "type": "string",
+            "description": "admin, member or guest",
+            "enum": [
+              "admin",
+              "member",
+              "guest"
+            ]
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "boolean",
+            "description": "Joined now"
+          },
+          "invited": {
+            "type": "boolean",
+            "description": "Will join on first sign-in"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [
+        "team.member.invited"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.revoke_invite",
+      "title": "Cancel an invite",
+      "description": "Cancel an invite that was not used yet.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "invite_id": {
+            "type": "string",
+            "description": "From team.get"
+          }
+        },
+        "required": [
+          "invite_id"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.set_role",
+      "title": "Change a role",
+      "description": "Make someone owner, admin, member or guest. A team always keeps one owner.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "account_id": {
+            "type": "string",
+            "description": "From team.get members"
+          },
+          "role": {
+            "type": "string",
+            "description": "The new role",
+            "enum": [
+              "owner",
+              "admin",
+              "member",
+              "guest"
+            ]
+          }
+        },
+        "required": [
+          "account_id",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [
+        "team.member.role_changed"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.remove_member",
+      "title": "Remove someone",
+      "description": "Take a person off the team. They keep their account.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "account_id": {
+            "type": "string",
+            "description": "From team.get members"
+          }
+        },
+        "required": [
+          "account_id"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [
+        "team.member.left"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.leave",
+      "title": "Leave a team",
+      "description": "Take yourself off a team. The last owner must hand over first.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug"
+          }
+        },
+        "required": [
+          "team"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "write",
+      "confirm": "none",
+      "emits": [
+        "team.member.left"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.delete",
+      "title": "Delete a team",
+      "description": "Delete a team and its brand and settings. Data each app keeps for the team is deleted by that app. Owners only. Cannot be undone.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug"
+          },
+          "confirm": {
+            "type": "string",
+            "description": "Type the team name to confirm"
+          }
+        },
+        "required": [
+          "team",
+          "confirm"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "delete",
+      "confirm": "human",
+      "emits": [
+        "team.deleted"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.get_brand",
+      "title": "Show the brand kit",
+      "description": "The team look every app uses: logos for light and dark, accent colour, fonts, scheme, and the custom domain if any.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "description": "The brand kit",
+        "properties": {
+          "logo_light": {
+            "type": "string"
+          },
+          "logo_dark": {
+            "type": "string"
+          },
+          "accent": {
+            "type": "string"
+          },
+          "on_accent": {
+            "type": "string"
+          },
+          "scheme": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "shape": {
+            "type": "string"
+          },
+          "font": {
+            "type": "string"
+          },
+          "display": {
+            "type": "string"
+          },
+          "fonts_href": {
+            "type": "string"
+          },
+          "custom_domain": {
+            "type": "object"
+          }
+        }
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.set_brand",
+      "title": "Save the brand kit",
+      "description": "Change any part of the team look. Only the fields you send change; send an empty string to clear one. Every app picks it up within a minute.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "logo_light": {
+            "type": "string",
+            "description": "Logo for light backgrounds: an https link or a data: image under 220 KB. Empty to remove."
+          },
+          "logo_dark": {
+            "type": "string",
+            "description": "Logo for dark backgrounds: an https link or a data: image under 220 KB. Empty to remove."
+          },
+          "accent": {
+            "type": "string",
+            "description": "Accent colour, like #4635ff."
+          },
+          "on_accent": {
+            "type": "string",
+            "description": "Text colour on the accent, like #ffffff."
+          },
+          "scheme": {
+            "type": "string",
+            "description": "ui-design colour scheme.",
+            "enum": [
+              "ops",
+              "midnight",
+              "neutral",
+              "ember",
+              "tide",
+              "sage",
+              "arcade",
+              "warroom",
+              ""
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "description": "Light, dark, or follow the device.",
+            "enum": [
+              "light",
+              "dark",
+              "auto",
+              ""
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "ui-design type set.",
+            "enum": [
+              "grotesk",
+              "mono",
+              "editorial",
+              "humanist",
+              "pixel",
+              "system",
+              ""
+            ]
+          },
+          "shape": {
+            "type": "string",
+            "description": "Corners.",
+            "enum": [
+              "sharp",
+              "soft",
+              "round",
+              ""
+            ]
+          },
+          "font": {
+            "type": "string",
+            "description": "Body font, like \"Poppins, sans-serif\"."
+          },
+          "display": {
+            "type": "string",
+            "description": "Heading font, like \"Anybody, sans-serif\"."
+          },
+          "fonts_href": {
+            "type": "string",
+            "description": "A Google Fonts or Bunny Fonts stylesheet link that loads the fonts above."
+          },
+          "custom_domain": {
+            "type": "string",
+            "description": "Your own address for the apps, like work.acme.example. Empty to remove."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "description": "The brand kit",
+        "properties": {
+          "logo_light": {
+            "type": "string"
+          },
+          "logo_dark": {
+            "type": "string"
+          },
+          "accent": {
+            "type": "string"
+          },
+          "on_accent": {
+            "type": "string"
+          },
+          "scheme": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "shape": {
+            "type": "string"
+          },
+          "font": {
+            "type": "string"
+          },
+          "display": {
+            "type": "string"
+          },
+          "fonts_href": {
+            "type": "string"
+          },
+          "custom_domain": {
+            "type": "object"
+          }
+        }
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [
+        "team.brand.changed"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.get_data_home",
+      "title": "Show where data lives",
+      "description": "Where the team data lives: warOnSaaS Cloud (the default), your own Postgres, or a repo in your own GitHub account. Database passwords are never shown.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "description": "Where the team data lives",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "cloud, postgres or github"
+          },
+          "host": {
+            "type": "string",
+            "description": "Database host (postgres)"
+          },
+          "database": {
+            "type": "string",
+            "description": "Database name (postgres)"
+          },
+          "repo": {
+            "type": "string",
+            "description": "owner/name (github)"
+          },
+          "installed": {
+            "type": "boolean",
+            "description": "The GitHub App is installed on the repo (github)"
+          },
+          "install_url": {
+            "type": "string",
+            "description": "Where to install the GitHub App (github)"
+          }
+        }
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.set_data_home",
+      "title": "Choose where data lives",
+      "description": "Point the team at a data home. cloud needs nothing. postgres needs database_url (checked by connecting, then kept encrypted). github needs repo (owner/name in your own account or organization) with the warOnSaaS GitHub App installed there; we never create organizations or keep your repos. Existing data does not move: use team.move_data_home for that.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "kind": {
+            "type": "string",
+            "description": "cloud, postgres or github",
+            "enum": [
+              "cloud",
+              "postgres",
+              "github"
+            ]
+          },
+          "database_url": {
+            "type": "string",
+            "description": "postgres only: postgres://user:password@host/db"
+          },
+          "repo": {
+            "type": "string",
+            "description": "github only: owner/name"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "description": "Where the team data lives",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "cloud, postgres or github"
+          },
+          "host": {
+            "type": "string",
+            "description": "Database host (postgres)"
+          },
+          "database": {
+            "type": "string",
+            "description": "Database name (postgres)"
+          },
+          "repo": {
+            "type": "string",
+            "description": "owner/name (github)"
+          },
+          "installed": {
+            "type": "boolean",
+            "description": "The GitHub App is installed on the repo (github)"
+          },
+          "install_url": {
+            "type": "string",
+            "description": "Where to install the GitHub App (github)"
+          }
+        }
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [
+        "team.data_home.changed"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.move_data_home",
+      "title": "Move my data home",
+      "description": "Plan or start copying every app's data from the current home to a new one. Returns the steps per app and what each one does. The copy runs per app; apps without a mover yet say so.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          },
+          "to": {
+            "type": "string",
+            "description": "cloud, postgres or github",
+            "enum": [
+              "cloud",
+              "postgres",
+              "github"
+            ]
+          },
+          "database_url": {
+            "type": "string",
+            "description": "postgres only"
+          },
+          "repo": {
+            "type": "string",
+            "description": "github only: owner/name"
+          },
+          "start": {
+            "type": "boolean",
+            "description": "false (default) only plans; true starts the copy"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "move_id": {
+            "type": "string",
+            "description": "Move id"
+          },
+          "status": {
+            "type": "string",
+            "description": "planned, running, done or failed"
+          },
+          "steps": {
+            "type": "array"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "admin",
+      "confirm": "human",
+      "emits": [
+        "team.data_home.moved"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "team.export",
+      "title": "Export everything",
+      "description": "One bundle of everything the team has: team, members, brand, data home, plus a download link per app (board, CRM, chat, email, meetings, scanner).",
+      "input": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "description": "The team id or slug. Leave out for your own team."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object"
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    }
+  ]
+}

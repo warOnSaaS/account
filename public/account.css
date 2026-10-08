@@ -1,0 +1,118 @@
+/* warOnSaaS Account: layout only. Every colour, radius and face comes from ui-design tokens. */
+body{margin:0;background:var(--ui-bg);color:var(--ui-ink);font-family:var(--ui-font);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+code{font-family:var(--ui-mono);font-size:.92em}
+.ac-mark{display:block;color:var(--ui-ink)}
+
+/* ---------- sign-in ---------- */
+.ac-gate-page{min-height:100svh;background:radial-gradient(900px 520px at 50% -10%,var(--ui-glow),transparent 70%),var(--ui-bg)}
+.ac-gate-wrap{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:40px 16px}
+.ac-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.01em;color:var(--ui-ink)}
+.ac-brand.is-small{font-size:14px}
+.ac-sub{color:var(--ui-ink-3);font-weight:500;padding-left:10px;border-left:1px solid var(--ui-line-2)}
+.ac-gate{width:min(420px,100%);text-align:left;padding:34px 30px 26px}
+.ac-gate h1{margin:0 0 8px;font-size:24px;line-height:1.2}
+.ac-tagline{margin:0 0 22px!important;color:var(--ui-ink-2);font-size:14.5px;line-height:1.55}
+.ac-note{margin:0 0 18px;text-align:left}
+.ac-ways{display:grid;gap:10px}
+.ac-gate .ac-ways .ui-btn,.ac-gate .ac-email .ui-btn{margin-top:0}
+.ac-way{gap:10px;justify-content:center}
+.ac-way svg,.ac-email svg{flex:none}
+.ac-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--ui-ink-3);font-size:12.5px;text-transform:lowercase}
+.ac-or::before,.ac-or::after{content:"";flex:1;height:1px;background:var(--ui-line-2)}
+.ac-email .ui-field{margin-bottom:10px}
+.ac-fine{margin:16px 0 0!important;text-align:center}
+.ac-foot{margin:0;max-width:420px;text-align:center;color:var(--ui-ink-3);font-size:13px;line-height:1.55}
+.ac-foot a{color:var(--ui-ink-2)}
+.ac-foot.is-left{text-align:left;max-width:none;margin-top:40px}
+.ac-big-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--ui-accent-wash);color:var(--ui-accent);margin-bottom:14px}
+.ac-big-icon svg{width:22px;height:22px}
+.ac-mt{margin-top:8px!important}
+.ac-can{margin:0 0 14px;padding:0;list-style:none;display:grid;gap:8px}
+.ac-can li{position:relative;padding:10px 12px 10px 34px;background:var(--ui-surface-2);border:1px solid var(--ui-line);border-radius:var(--ui-radius-sm);font-size:14px}
+.ac-can li::before{content:"";position:absolute;left:13px;top:15px;width:8px;height:8px;border-radius:50%;background:var(--ui-accent)}
+
+/* ---------- account home ---------- */
+.ac-shell{min-height:100svh}
+.ac-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;background:color-mix(in srgb,var(--ui-bg) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--ui-line)}
+.ac-top-r{display:flex;align-items:center;gap:10px}
+.ac-top-r form{margin:0}
+.ac-who{font-size:13px;color:var(--ui-ink-2)}
+.ac-body{display:grid;grid-template-columns:200px minmax(0,760px);gap:48px;justify-content:center;padding:32px 24px 64px}
+.ac-nav{position:sticky;top:76px;align-self:start;display:grid;gap:2px}
+.ac-nav a{display:block;padding:7px 12px;border-radius:var(--ui-radius-sm);font-size:14px;color:var(--ui-ink-2);text-decoration:none}
+.ac-nav a:hover{background:var(--ui-hover);color:var(--ui-ink)}
+.ac-nav a[aria-current]{background:var(--ui-surface-2);color:var(--ui-ink);font-weight:500}
+.ac-main{min-width:0}
+.ac-sec{scroll-margin-top:80px;padding-bottom:40px;margin-bottom:40px;border-bottom:1px solid var(--ui-line)}
+.ac-sec:last-of-type{border-bottom:0}
+.ac-sec h2{margin:0 0 12px;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.ac-sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.ac-sec-h h2{margin:0}
+.ac-mt-l{margin-top:28px!important}
+.ac-lede{margin:-4px 0 14px;font-size:14px;line-height:1.55}
+.ac-head{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.ac-head h1{margin:0;font-size:26px;font-family:var(--ui-display);letter-spacing:-.02em}
+.ac-head p{margin:4px 0 0;font-size:14px}
+.ac-flash{margin-bottom:24px}
+.ac-form{display:block}
+.ac-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:12px}
+.ac-actions.is-left{justify-content:flex-start}
+.ac-list{list-style:none;margin:0;padding:4px 16px}
+.ac-list.is-flat{padding:0;margin:8px 0 4px}
+.ac-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--ui-line)}
+.ac-list>.ac-row:first-child,.ac-list>div.ac-row:first-child{border-top:0}
+.ac-row-main{flex:1;min-width:0;display:grid;gap:3px}
+.ac-row-main b{font-weight:500;font-size:14px}
+.ac-row-main small{color:var(--ui-ink-3);font-size:12.5px;overflow-wrap:anywhere}
+.ac-role{width:auto;min-height:30px;padding:4px 28px 4px 10px;font-size:13px}
+.ac-inline{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px}
+.ac-inline .ui-field{flex:1;min-width:180px;margin-bottom:0}
+.ac-inline .ac-narrow{flex:0 0 130px;min-width:0}
+.ac-inline.is-compact .ui-field{min-width:160px}
+.ui-card .ac-inline+.ac-list,.ui-card .ac-list+.ac-inline{margin-top:14px}
+.ac-team-pick select{min-height:32px;padding:4px 30px 4px 10px;font-size:13.5px}
+.ac-apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.ac-app{display:grid;gap:4px;padding:14px 16px;border-radius:var(--ui-radius);text-decoration:none}
+.ac-app b{font-weight:600;font-size:14.5px}.ac-app small{color:var(--ui-ink-3);font-size:12.5px;line-height:1.45}
+.ac-approval{margin-bottom:10px}.ac-approval p{margin:0;font-size:14px}
+.ac-two,.ac-three{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.ac-three{grid-template-columns:repeat(3,1fr)}
+.ac-file{margin-top:6px;font-size:12.5px;color:var(--ui-ink-3);max-width:100%}
+.ac-colour{display:flex;gap:8px;align-items:center}
+.ac-colour input[type=color]{width:40px;height:40px;flex:none;padding:0;border:1px solid var(--ui-line-2);border-radius:var(--ui-radius-sm);background:none;cursor:pointer}
+.ac-brand-grid{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px;align-items:start}
+.ac-preview{display:grid;gap:10px;position:sticky;top:80px}
+.ac-preview-card{padding:16px;border-radius:var(--ui-radius);background:#111113;color:#fafafa;border:1px solid rgba(255,255,255,.12);font-family:var(--pv-font,var(--ui-font))}
+.ac-preview-card.is-light{background:#fff;color:#0b1220;border-color:rgba(15,23,42,.12)}
+.ac-preview-card p{margin:10px 0 12px;font-size:13px;opacity:.75}
+.ac-preview-top{min-height:26px;display:flex;align-items:center}
+.ac-preview-top img{max-height:26px;max-width:100%}
+.ac-preview-top b{font-size:14px}
+.ac-preview-btn{display:inline-block;padding:7px 12px;border-radius:var(--ui-radius-sm);font-size:13px;font-weight:600;background:var(--pv-accent,var(--ui-accent));color:var(--pv-on,var(--ui-on-accent))}
+.ac-homes{grid-template-columns:repeat(3,1fr)}
+.ac-when[hidden]{display:none}
+.ac-move{display:flex;align-items:center;gap:14px;margin-top:12px}
+.ac-move-plan{margin-top:12px}
+.ac-steps{margin:8px 0;padding-left:20px;display:grid;gap:8px;font-size:14px}
+.ac-steps small{color:var(--ui-ink-3)}
+.ac-ask .ui-field[hidden]{display:none}
+
+@media (max-width:900px){
+  .ac-body{grid-template-columns:minmax(0,1fr);gap:0;padding:0 16px 48px}
+  .ac-nav{position:sticky;top:57px;z-index:4;display:flex;overflow-x:auto;gap:4px;margin:0 -16px 24px;padding:8px 16px;background:var(--ui-bg);border-bottom:1px solid var(--ui-line);scrollbar-width:none}
+  .ac-nav::-webkit-scrollbar{display:none}
+  .ac-nav a{white-space:nowrap;padding:6px 10px;font-size:13.5px}
+  .ac-brand-grid{grid-template-columns:minmax(0,1fr)}
+  .ac-preview{position:static;grid-template-columns:1fr 1fr}
+  .ac-preview .ui-hint{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .ac-top{padding:10px 16px}
+  .ac-gate{padding:28px 20px 22px}
+  .ac-two,.ac-three,.ac-homes{grid-template-columns:minmax(0,1fr)}
+  .ac-row{flex-wrap:wrap}
+  .ac-move{flex-direction:column;align-items:stretch}
+  .ac-inline .ac-narrow{flex:1 1 100%}
+  .ac-head h1{font-size:22px}
+}

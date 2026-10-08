@@ -1,0 +1,15 @@
+{
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.mjs": { "includeFiles": "{migrations/**,tools.json,team.tools.json,public/**}", "maxDuration": 30 }
+  },
+  "rewrites": [
+    { "source": "/((?!ui/|account\\.css$|app\\.js$|prompt\\.js$|favicon\\.svg$|account-client\\.mjs$).*)", "destination": "/api/index?__p=/$1" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }, { "key": "Strict-Transport-Security", "value": "max-age=63072000" }] },
+    { "source": "/prompt.js", "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }, { "key": "Cache-Control", "value": "public, max-age=300" }] },
+    { "source": "/account-client.mjs", "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }] }
+  ],
+  "regions": ["iad1"]
+}

@@ -1,0 +1,23 @@
+# Host warOnSaaS Account yourself: docker compose up, then open http://localhost:3990
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: account, POSTGRES_DB: wos_account }
+    volumes: [db:/var/lib/postgresql/data]
+  account:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci --omit=dev && node server.mjs"
+    volumes: [.:/app]
+    ports: ["3990:3990"]
+    environment:
+      DATABASE_URL: postgres://postgres:account@db:5432/wos_account
+      PUBLIC_URL: http://localhost:3990
+      ACCOUNT_SECRET: ${ACCOUNT_SECRET:-change-me-to-32-random-characters}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      GITHUB_APP_CLIENT_ID: ${GITHUB_APP_CLIENT_ID:-}
+      GITHUB_APP_CLIENT_SECRET: ${GITHUB_APP_CLIENT_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    depends_on: [db]
+volumes: { db: {} }

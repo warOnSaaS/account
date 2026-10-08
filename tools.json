@@ -1,0 +1,318 @@
+{
+  "$schema": "https://raw.githubusercontent.com/warOnSaaS/suite/main/packages/tools/tools.schema.json",
+  "app": "account",
+  "version": 1,
+  "tools": [
+    {
+      "name": "account.me",
+      "title": "Show my account",
+      "description": "Your warOnSaaS account: name, email, the ways you sign in (GitHub, Google, email), your teams, and whether you get update emails.",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Account id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "updates_opt_in": {
+            "type": "boolean",
+            "description": "Gets update emails"
+          },
+          "identities": {
+            "type": "array"
+          },
+          "teams": {
+            "type": "array"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.update_profile",
+      "title": "Save my profile",
+      "description": "Change your name, or turn update emails on or off. Update emails are rare: new apps and big changes, never ads from others.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Your name as teammates see it"
+          },
+          "updates_opt_in": {
+            "type": "boolean",
+            "description": "Send me update emails"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "write",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.list_sessions",
+      "title": "List where I am signed in",
+      "description": "Every browser, app and AI connection signed in to your account, newest first. Connections are AI apps (Claude, ChatGPT, Codex, Claude Code) acting as you.",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "sessions": {
+            "type": "array"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.end_session",
+      "title": "Sign out of one place",
+      "description": "Sign out one browser, app or AI connection by its session id. A browser takes the apps it signed in to with it.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "From account.list_sessions"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "write",
+      "confirm": "none",
+      "emits": [
+        "account.session.ended"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.sign_out_everywhere",
+      "title": "Sign out everywhere",
+      "description": "Sign out every browser, app and AI connection on your account, this one included.",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ended": {
+            "type": "integer"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "write",
+      "confirm": "none",
+      "emits": [
+        "account.session.ended"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.unlink_identity",
+      "title": "Remove a way to sign in",
+      "description": "Remove GitHub, Google or an email address as a way into this account. You always keep at least one.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "identity_id": {
+            "type": "string",
+            "description": "From account.me identities"
+          }
+        },
+        "required": [
+          "identity_id"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "write",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.export",
+      "title": "Export my account",
+      "description": "Everything warOnSaaS Account keeps about you, as JSON: profile, ways in, sessions, teams, and the history of changes.",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object"
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.delete",
+      "title": "Delete my account",
+      "description": "Delete your account and sign out everywhere. Teams you alone are on go with it; on shared teams the next person becomes owner. Cannot be undone.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "confirm": {
+            "type": "string",
+            "description": "Type delete to confirm"
+          }
+        },
+        "required": [
+          "confirm"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "Done"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "delete",
+      "confirm": "human",
+      "emits": [
+        "account.deleted"
+      ],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.list_approvals",
+      "title": "List what waits for my yes",
+      "description": "Actions an AI app asked to do that need you to say yes first, like deleting the account.",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "approvals": {
+            "type": "array"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "scope": "read",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    },
+    {
+      "name": "account.answer_approval",
+      "title": "Answer an approval",
+      "description": "Say yes or no to an action an AI app asked for. Only a person on a screen can answer.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string",
+            "description": "From account.list_approvals"
+          },
+          "answer": {
+            "type": "string",
+            "description": "yes or no",
+            "enum": [
+              "yes",
+              "no"
+            ]
+          }
+        },
+        "required": [
+          "approval_id",
+          "answer"
+        ],
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object"
+      },
+      "scope": "admin",
+      "confirm": "none",
+      "emits": [],
+      "test": "test/tools.test.mjs"
+    }
+  ]
+}
