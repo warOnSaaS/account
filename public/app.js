@@ -48,6 +48,7 @@
     if (then === 'team') return (location.href = `/?team=${encodeURIComponent(result.slug)}#team`);
     if (then === 'download') { download(el.dataset.file || 'export.json', result); return toast('Downloaded'); }
     if (then === 'move') return showMove(result);
+    if (then === 'go') return location.assign(el.dataset.go || '/');
     toast(el.dataset.ok || 'Done');
   }
 

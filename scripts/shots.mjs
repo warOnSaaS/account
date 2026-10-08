@@ -21,6 +21,10 @@ for (const [w, h, tag] of [[1440, 960, '1440'], [390, 844, '390']]) {
   await page.waitForSelector('text=Sign in as');
   await page.screenshot({ path: `.shots/confirm-${tag}.png` });
   await page.click('button:has-text("Continue")');
+  await page.waitForSelector('text=What should we call you');
+  await page.fill('input[name=name]', 'Sam Rivera');
+  await page.screenshot({ path: `.shots/welcome-${tag}.png` });
+  await page.click('button:has-text("Continue")');
   await page.waitForSelector('#profile');
   // Fill in a little so the page looks used.
   await page.evaluate(async () => {
@@ -44,6 +48,8 @@ for (const [w, h, tag] of [[1440, 960, '1440'], [390, 844, '390']]) {
   await page.click('form.ac-email button');
   await page.click('text=open the link');
   await page.click('button:has-text("Continue")');
+  await page.waitForSelector('text=What should we call you');
+  await page.goto(`${base}/`);
   const reg = await page.evaluate(async () => (await fetch('/oauth/register', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ client_name: 'Claude Code', redirect_uris: ['http://localhost:33418/callback'] }) })).json());
   await page.goto(`${base}/oauth/authorize?client_id=${reg.client_id}&redirect_uri=${encodeURIComponent('http://localhost:33418/callback')}&response_type=code&code_challenge=abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG&code_challenge_method=S256&scope=openid%20account`);
   await page.screenshot({ path: '.shots/consent-1440.png' });

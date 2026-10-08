@@ -61,7 +61,9 @@ export function createHandler(env = process.env) {
     const sid = await ctx.store.createSession(r.account.id, { kind: 'browser', method: identity.provider, userAgent: req.headers['user-agent'], ttl: 30 * DAY });
     const raw = await ctx.store.issueToken(sid, 'browser', 30 * DAY);
     await ctx.store.event(r.account.id, 'signed_in', { method: identity.provider });
-    redirect(res, safeNext(next), { 'set-cookie': setSession(raw, 30 * DAY) });
+    // A new account made from an email link only has a name guessed from the address: ask once.
+    const to = r.created && identity.provider === 'email' ? `/welcome?next=${encodeURIComponent(safeNext(next))}` : safeNext(next);
+    redirect(res, to, { 'set-cookie': setSession(raw, 30 * DAY) });
   }
 
   // Shows "Sign in to use <app>" when the sign-in was asked for by one of our apps or an AI app.
@@ -241,6 +243,13 @@ export function createHandler(env = process.env) {
       const got = await ctx.store.takeOnceStrict(String(b.t ?? ''), 'email');
       if (!got.data || got.reused) return signIn(res, '/', 'That link has expired or was already used. Ask for a new one.');
       return finishSignIn(req, res, { provider: 'email', subject: got.data.e, email: got.data.e, emailVerified: true, verifiedEmails: [got.data.e], name: null }, got.data.n);
+    }
+
+    if (p === '/welcome' && req.method === 'GET') {
+      const s = await browserSession(req);
+      if (!s) return signIn(res, safeNext(q.next));
+      const account = await ctx.store.account(s.account_id);
+      return html(res, 200, P.welcomePage({ account, next: safeNext(q.next) }));
     }
 
     // ---------- the account page ----------

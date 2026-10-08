@@ -42,6 +42,7 @@ async function emailSignIn(email) {
   assert.match(await g.text(), /Sign in as/);
   const p = await req('/auth/email/verify', { method: 'POST', form: true, body: { t }, cookies: c });
   assert.equal(p.status, 302);
+  assert.match(p.headers.get('location'), /^\/(welcome\?next=|$)/);
   assert.ok(c.has('wos_account'));
   return c;
 }

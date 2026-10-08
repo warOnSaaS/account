@@ -55,6 +55,7 @@ test('every screen action names a tool (parity)', () => {
     confirm: P.confirmLinkPage({ email: 'sam@acme.example', token: 't' }),
     consent: P.consentPage({ client: { name: 'Claude Code', first_party: false }, account: { email: 'sam@acme.example' }, scope: 'openid account', request: { r: 'r', back: '/' } }),
     message: P.messagePage({ title: 'x', text: 'y', link: { href: '/', label: 'Back' } }),
+    welcome: P.welcomePage({ account: { name: 'Sam' }, next: '/' }),
   };
   const report = {};
   let missing = [];
