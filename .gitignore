@@ -5,3 +5,4 @@ node_modules
 *.names
 .names
 parity-report.json
+.github-app-status
