@@ -255,3 +255,27 @@ test('delete account from the screen', async () => {
   assert.equal((await req('/', { cookies: riley })).status, 200);
   assert.match(await (await req('/', { cookies: riley })).text(), /Sign in to warOnSaaS/);
 });
+
+test('sign out everywhere and delete reach apps over the back-channel', async () => {
+  const got = [];
+  const app = http.createServer(async (rq, rs) => { let b = ''; for await (const c of rq) b += c; got.push({ path: rq.url, token: new URLSearchParams(b).get('logout_token') }); rs.writeHead(200).end(); }).listen(0);
+  const home = `http://127.0.0.1:${app.address().port}`;
+  const { openDb } = await import('../lib/db.mjs');
+  const { upsertClient } = await import('../lib/clients.mjs');
+  const db = openDb(DB);
+  const sec = (await upsertClient(db, { id: 'chat', name: 'Chat', redirectUris: ['http://localhost:9998/auth/waronsaas/callback'], home })).secret;
+  await db.close();
+  const { WosAccount } = await import('../client/account-client.mjs');
+  const acct = new WosAccount({ issuer: base, clientId: 'chat', clientSecret: sec, redirectUri: 'http://localhost:9998/auth/waronsaas/callback' });
+  const jordan = await emailSignIn('jordan2@birch.example');
+  const me = (await (await tool('account.me', {}, jordan)).json()).result;
+  await tool('account.sign_out_everywhere', {}, jordan);
+  assert.equal(got.length, 1);
+  assert.equal(got[0].path, '/auth/waronsaas/backchannel');
+  assert.deepEqual(await acct.verifyLogoutToken(got[0].token), { sub: me.id, deleted: false });
+  assert.equal(await acct.verifyLogoutToken('nope.nope.nope'), null);
+  const j2 = await emailSignIn('jordan2@birch.example');
+  await tool('account.delete', { confirm: 'delete' }, j2);
+  assert.deepEqual(await acct.verifyLogoutToken(got.at(-1).token), { sub: me.id, deleted: true });
+  app.close();
+});

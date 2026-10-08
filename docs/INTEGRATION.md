@@ -132,3 +132,7 @@ Tools: `team.get_data_home`, `team.set_data_home`, `team.move_data_home` (plans 
 ## 9. Account and team tools
 
 `account.me`, `account.update_profile`, `account.list_sessions`, `account.end_session`, `account.sign_out_everywhere`, `account.unlink_identity`, `account.export`, `account.delete` (human), `account.list_approvals`, `account.answer_approval` (screen only), `team.list`, `team.create`, `team.get`, `team.update`, `team.invite`, `team.revoke_invite`, `team.set_role`, `team.remove_member`, `team.leave`, `team.delete` (human), `team.get_brand`, `team.set_brand`, `team.get_data_home`, `team.set_data_home`, `team.move_data_home` (human), `team.export`. Catalogues: `tools.json` and `team.tools.json` in the repo.
+
+## 10. Hearing sign-outs and deletions at once (optional, recommended)
+
+When someone presses **Sign out everywhere** or deletes their account, the account POSTs to `https://<app host>/auth/waronsaas/backchannel` with a form field `logout_token` (an OpenID Connect back-channel logout token). Verify it with `await account.verifyLogoutToken(token)`: it returns `{ sub, deleted }` or `null`. End every session of that `sub`; when `deleted` is true, remove or anonymise the person by your app's rules. Always answer 200. Without this route, `isLive(sid)` still catches the sign-out within a minute.

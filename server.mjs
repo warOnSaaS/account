@@ -41,7 +41,7 @@ export function createHandler(env = process.env) {
       await c.connect();
       try { await c.query('SELECT 1'); } finally { await c.end().catch(() => {}); }
     };
-    const H = makeTools({ db, store, teams, connect });
+    const H = makeTools({ db, store, teams, connect, issuer });
     ctx = { db, store, teams, oidc, H, mail: mailer(env) };
     return ctx;
   })().catch((e) => { ready = null; throw e; }));
