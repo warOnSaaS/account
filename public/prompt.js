@@ -32,7 +32,7 @@
 
   const css = `.wos-ap{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:16px;background:var(--ui-scrim,rgba(0,0,0,.55));-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:wos-ap-in .16s ease-out}
 .wos-ap-card{width:min(400px,100%);background:var(--ui-surface,#111113);color:var(--ui-ink,#fafafa);border:1px solid var(--ui-line-2,rgba(255,255,255,.14));border-radius:var(--ui-radius-lg,14px);padding:26px 24px 20px;box-shadow:var(--ui-shadow-lg,0 24px 60px rgba(0,0,0,.45));font-family:var(--ui-font,system-ui,sans-serif)}
-.wos-ap h2{margin:0 0 6px;font-size:20px;line-height:1.25;font-family:var(--ui-display,inherit);font-weight:var(--ui-display-weight,600)}
+.wos-ap h2{color:var(--ui-ink,#fafafa);margin:0 0 6px;font-size:20px;line-height:1.25;font-family:var(--ui-display,inherit);font-weight:var(--ui-display-weight,600)}
 .wos-ap p{margin:0 0 18px;color:var(--ui-ink-2,#a1a1aa);font-size:14px;line-height:1.55}
 .wos-ap-b{display:grid;gap:8px}
 .wos-ap a,.wos-ap button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:42px;border-radius:var(--ui-radius-sm,8px);font:500 15px/1 var(--ui-font,system-ui,sans-serif);text-decoration:none;cursor:pointer;border:1px solid var(--ui-line,rgba(255,255,255,.1));background:var(--ui-surface-2,#18181b);color:var(--ui-ink,#fafafa)}
@@ -86,7 +86,7 @@ ${cfg.providers.includes('email') ? `<a href="${esc(go())}" data-tool="none" dat
     if (!tool || tool === 'none' || a.hasAttribute('data-public')) return null;
     return a;
   };
-  const label = (a) => a.getAttribute('data-action-label') || a.getAttribute('aria-label') || a.getAttribute('title') || (a.tagName === 'FORM' ? a.querySelector('[type=submit]')?.textContent : a.textContent) || '';
+  const label = (a) => a.getAttribute('data-action-label') || a.getAttribute('aria-label') || a.getAttribute('title') || (a.tagName === 'FORM' ? a.querySelector('[type=submit], button:not([type])')?.textContent : a.textContent) || '';
 
   if (!cfg.signedIn) {
     document.addEventListener('click', (e) => {
