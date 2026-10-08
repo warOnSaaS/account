@@ -10,7 +10,7 @@ code{font-family:var(--ui-mono);font-size:.92em}
 .ac-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.01em;color:var(--ui-ink)}
 .ac-brand.is-small{font-size:14px}
 .ac-sub{color:var(--ui-ink-3);font-weight:500;padding-left:10px;border-left:1px solid var(--ui-line-2)}
-.ac-gate{width:min(420px,100%);text-align:left;padding:34px 30px 26px}
+.ac-gate{margin:0;width:min(420px,100%);text-align:left;padding:34px 30px 26px}
 .ac-gate h1{margin:0 0 8px;font-size:24px;line-height:1.2}
 .ac-tagline{margin:0 0 22px!important;color:var(--ui-ink-2);font-size:14.5px;line-height:1.55}
 .ac-note{margin:0 0 18px;text-align:left}
@@ -116,3 +116,5 @@ code{font-family:var(--ui-mono);font-size:.92em}
   .ac-inline .ac-narrow{flex:1 1 100%}
   .ac-head h1{font-size:22px}
 }
+.ac-row-main>.ui-chip{justify-self:start}
+.ac-row-main b .ui-chip{margin-left:6px;vertical-align:1px}
