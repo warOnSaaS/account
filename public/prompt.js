@@ -30,7 +30,7 @@
     if (cfg.signedIn) sessionStorage.removeItem('wos_silent_tried');
   } catch { /* storage blocked: skip silent sign-in */ }
 
-  const css = `.wos-ap{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:16px;background:var(--ui-scrim,rgba(0,0,0,.55));-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:wos-ap-in .16s ease-out}
+  const css = `.wos-ap{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:16px;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;color:inherit;overflow:auto;background:var(--ui-scrim,rgba(0,0,0,.55));-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:wos-ap-in .16s ease-out}
 .wos-ap-card{width:min(400px,100%);background:var(--ui-surface,#111113);color:var(--ui-ink,#fafafa);border:1px solid var(--ui-line-2,rgba(255,255,255,.14));border-radius:var(--ui-radius-lg,14px);padding:26px 24px 20px;box-shadow:var(--ui-shadow-lg,0 24px 60px rgba(0,0,0,.45));font-family:var(--ui-font,system-ui,sans-serif)}
 .wos-ap h2{color:var(--ui-ink,#fafafa);margin:0 0 6px;font-size:20px;line-height:1.25;font-family:var(--ui-display,inherit);font-weight:var(--ui-display-weight,600)}
 .wos-ap p{margin:0 0 18px;color:var(--ui-ink-2,#a1a1aa);font-size:14px;line-height:1.55}
@@ -68,11 +68,16 @@ ${cfg.providers.includes('google') ? `<a href="${esc(go('&provider=google'))}" d
 ${cfg.providers.includes('email') ? `<a href="${esc(go())}" data-tool="none" data-why="Starts sign-in">Use my email</a>` : ''}
 <button type="button" class="is-quiet" data-tool="none" data-why="Closes the prompt">Keep looking</button></div>
 <small>Everything stays open to look at. One free account works in every warOnSaaS app.</small></div>`;
-    const close = () => { el.remove(); open = null; document.removeEventListener('keydown', onKey, true); prev?.focus?.(); };
+    const close = () => { try { el.hidePopover?.(); } catch {} el.remove(); open = null; document.removeEventListener('keydown', onKey, true); prev?.focus?.(); };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     el.addEventListener('click', (e) => { if (e.target === el || e.target.closest('button.is-quiet')) close(); });
     document.addEventListener('keydown', onKey, true);
-    document.body.appendChild(el);
+    // A popover sits in the top layer, above any open <dialog> the app shows.
+    if (typeof el.showPopover === 'function') el.setAttribute('popover', 'manual');
+    // An open modal dialog makes the rest of the page inert, so the prompt goes inside the topmost one.
+    const modal = [...document.querySelectorAll('dialog[open]')].filter((d) => { try { return d.matches(':modal'); } catch { return false; } }).pop();
+    (modal ?? document.body).appendChild(el);
+    try { el.showPopover?.(); } catch { /* older browsers: the fixed overlay is enough */ }
     open = el;
     el.querySelector('a,button')?.focus();
     return false;

@@ -116,6 +116,19 @@ if (mcpApp) {
     out.mcp = { app: mcpApp, tools: list.length, called: whoTool?.name, result: JSON.stringify(call?.structuredContent ?? call?.content?.[0]?.text ?? null).slice(0, 300), sessions: null };
     console.log(`mcp ${mcpApp}: ${list.length} tools; ${whoTool?.name} -> ${out.mcp.result}`);
     if (opt('token-file')) fs.writeFileSync(opt('token-file'), tok.access_token, { mode: 0o600 });
+    // Claude Code itself: add the app's MCP with this account-issued token, ask Claude Code whether it connects
+    // (a health check, no model run), then remove it again. The token never prints.
+    if (args.includes('--claude')) {
+      const { spawnSync } = await import('node:child_process');
+      const cwd = fs.mkdtempSync('/tmp/wos-claude-');
+      const name = `wos-${mcpApp}-verify`;
+      spawnSync('claude', ['mcp', 'add', '--transport', 'http', '--scope', 'local', name, `${base}/mcp`, '--header', `Authorization: Bearer ${tok.access_token}`], { cwd, stdio: 'ignore' });
+      const listed = spawnSync('claude', ['mcp', 'list'], { cwd, encoding: 'utf8', timeout: 90000 }).stdout ?? '';
+      const line = listed.split('\n').find((l) => l.includes(name)) ?? '';
+      out.mcp.claude_code = line.replace(/Bearer\s+\S+/g, 'Bearer ***').trim();
+      console.log('claude mcp list:', out.mcp.claude_code || '(not listed)');
+      spawnSync('claude', ['mcp', 'remove', '--scope', 'local', name], { cwd, stdio: 'ignore' });
+    }
     // The account lists the connection as an AI app acting as this person.
     await page.goto(`${A}/#signins`);
     const sess = await page.evaluate(() => window.callTool('account.list_sessions', {}));
