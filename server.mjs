@@ -1,3 +1,4 @@
+import { brandFor } from './lib/brands.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -73,9 +74,15 @@ export function createHandler(env = process.env) {
     const c = await ctx.oidc.client(q.get('client_id'));
     return c ? (q.get('connection') || c.name) : null;
   }
+  /* the registered client a sign-in is for, so the pages and email can carry its brand */
+  async function clientFor(next) {
+    if (!String(next).startsWith('/oauth/authorize')) return null;
+    const id = new URL(next, issuer).searchParams.get('client_id');
+    return id && (await ctx.oidc.client(id)) ? id : null;
+  }
 
   async function signIn(res, next, note = '', email = '') {
-    html(res, 200, P.signInPage({ next, note, providers: enabled(env), app: await appNameFor(next), email }));
+    html(res, 200, P.signInPage({ next, note, providers: enabled(env), app: await appNameFor(next), email, client: await clientFor(next) }));
   }
 
   // Who is calling a tool: a person on the account page (cookie plus the x-wos-call header, which a form on
@@ -223,21 +230,24 @@ export function createHandler(env = process.env) {
       const raw = secret('wel');
       await ctx.store.putOnce(raw, 'email', { e: email, n: next }, 900);
       const link = `${issuer}/auth/email/verify?t=${encodeURIComponent(raw)}`;
-      const app = await appNameFor(next);
+      const app = await appNameFor(next), client = await clientFor(next), brand = brandFor(client);
       await ctx.mail.send({
         to: email,
-        subject: app ? `Sign in to use ${app}` : 'Your warOnSaaS sign-in link',
-        text: `Sign in to warOnSaaS${app ? ` and continue to ${app}` : ''}:\n\n${link}\n\nThe link works once, for 15 minutes. If you did not ask for it, ignore this email; nothing happens without it.\n\nwarOnSaaS`,
-        html: emailHtml({ link, app }),
+        fromName: brand ? brand.name : null,
+        subject: brand ? `Your ${brand.name} sign-in link` : app ? `Sign in to use ${app}` : 'Your warOnSaaS sign-in link',
+        text: brand
+          ? `Sign in to ${brand.name}:\n\n${link}\n\nThe link works once, for 15 minutes. If you did not ask for it, ignore this email; nothing happens without it.\n\n${brand.name}`
+          : `Sign in to warOnSaaS${app ? ` and continue to ${app}` : ''}:\n\n${link}\n\nThe link works once, for 15 minutes. If you did not ask for it, ignore this email; nothing happens without it.\n\nwarOnSaaS`,
+        html: emailHtml({ link, app, brand }),
       });
-      return html(res, 200, P.checkEmailPage({ email, next, dev: env.ACCOUNT_DEV_LINKS === '1' ? link : null }));
+      return html(res, 200, P.checkEmailPage({ email, next, dev: env.ACCOUNT_DEV_LINKS === '1' ? link : null, client }));
     }
     if (p === '/auth/email/verify') {
       if (req.method !== 'POST') {
         // Mail scanners open links, so signing in takes a press. Peek without using the link up.
         const row = await ctx.db.get('SELECT data FROM one_time WHERE hash = $1 AND kind = $2 AND used_at IS NULL AND expires_at > now()', [sha256(String(q.t ?? '')), 'email']);
         if (!row) return signIn(res, '/', 'That link has expired or was already used. Ask for a new one.');
-        return html(res, 200, P.confirmLinkPage({ email: row.data.e, token: q.t }));
+        return html(res, 200, P.confirmLinkPage({ email: row.data.e, token: q.t, client: await clientFor(row.data.n || '/') }));
       }
       const b = await bodyOf(req);
       const got = await ctx.store.takeOnceStrict(String(b.t ?? ''), 'email');
@@ -345,12 +355,15 @@ export function createHandler(env = process.env) {
 
 const cors = () => ({ 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization, content-type', 'access-control-allow-methods': 'GET, POST, OPTIONS' });
 
-function emailHtml({ link, app }) {
+function emailHtml({ link, app, brand = null }) {
   const e = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   return `<!doctype html><html><body style="margin:0;background:#09090b;padding:32px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#fafafa">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center"><table role="presentation" width="440" cellpadding="0" cellspacing="0" style="max-width:440px;background:#111113;border:1px solid rgba(255,255,255,.14);border-radius:14px">
-<tr><td style="padding:28px 28px 8px;font-size:13px;color:#a1a1aa;letter-spacing:.02em">warOnSaaS</td></tr>
-<tr><td style="padding:0 28px;font-size:22px;font-weight:600">${app ? `Sign in to use ${e(app)}` : 'Sign in to warOnSaaS'}</td></tr>
+${brand
+  ? `<tr><td style="padding:26px 28px 12px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="padding-right:10px"><img src="${e(brand.png)}" width="28" height="28" alt="" style="display:block;border-radius:7px"></td><td style="font-size:15px;font-weight:600;color:#fafafa">${e(brand.name)}</td></tr></table></td></tr>
+<tr><td style="padding:0 28px;font-size:22px;font-weight:600">Sign in to ${e(brand.name)}</td></tr>`
+  : `<tr><td style="padding:28px 28px 8px;font-size:13px;color:#a1a1aa;letter-spacing:.02em">warOnSaaS</td></tr>
+<tr><td style="padding:0 28px;font-size:22px;font-weight:600">${app ? `Sign in to use ${e(app)}` : 'Sign in to warOnSaaS'}</td></tr>`}
 <tr><td style="padding:12px 28px 0;font-size:14px;line-height:1.55;color:#a1a1aa">Press the button to sign in. It works once, for 15 minutes.</td></tr>
 <tr><td style="padding:22px 28px"><a href="${e(link)}" style="display:block;text-align:center;background:#7dd3fc;color:#04202e;text-decoration:none;font-weight:600;font-size:15px;padding:12px 16px;border-radius:9px">Sign in</a></td></tr>
 <tr><td style="padding:0 28px 26px;font-size:12.5px;line-height:1.5;color:#8b8b95">If you did not ask for this, ignore it; nothing happens without the link.</td></tr>
